@@ -1,10 +1,14 @@
+"use client";
+import { Button } from "@/components/ui/button";
+import { useNewAccount } from "@/features/accounts/hooks/use-new-account";
 import React from "react";
 
 const DashboardPage = () => {
+  const { onOpen } = useNewAccount();
   return (
-    <main>
-      <div>Dashboard Page</div>
-    </main>
+    <div>
+      <Button onClick={onOpen}>Add an account</Button>
+    </div>
   );
 };
 
