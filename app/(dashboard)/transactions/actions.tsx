@@ -18,7 +18,7 @@ const Actions = ({ id }: Props) => {
   const deleteMutation = useDeleteTransaction(id);
   const [ConfirmDialog, confirm] = useConfirm(
     "Are you sure?",
-    "This will delete the transaction and all its transactions. This cannot be undone."
+    "This will delete the transaction. This cannot be undone."
   );
   const handleDelete = async () => {
     const ok = await confirm();

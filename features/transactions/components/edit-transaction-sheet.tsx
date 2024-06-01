@@ -16,6 +16,10 @@ import { Loader2 } from "lucide-react";
 import { useEditTransaction } from "@/features/transactions/api/use-edit-transaction";
 import { useDeleteTransaction } from "@/features/transactions/api/use-delete-transaction";
 import { useConfirm } from "@/hooks/use-confirm";
+import { useCreateCategory } from "@/features/categories/api/use-create-category";
+import { useGetCategories } from "@/features/categories/api/use-get-categories";
+import { useCreateAccount } from "@/features/accounts/api/use-create-account";
+import { useGetAccounts } from "@/features/accounts/api/use-get-accounts";
 
 const formSchema = insertTransactionSchema.omit({
   id: true,
@@ -33,9 +37,35 @@ const EditTransactionSheet = () => {
   const transactionQuery = useGetTransaction(id);
   const editMutation = useEditTransaction(id);
   const deleteMutation = useDeleteTransaction(id);
+  const categoryMutation = useCreateCategory();
+  const categoryQuery = useGetCategories();
 
-  const isLoading = transactionQuery.isLoading;
-  const isPending = editMutation.isPending || deleteMutation.isPending;
+  const onCreateCategory = (name: string) => categoryMutation.mutate({ name });
+  const categoryOptions = (categoryQuery.data ?? []).map((category) => ({
+    label: category.name,
+    value: category.id,
+  }));
+
+  const accountMutation = useCreateAccount();
+  const accountQuery = useGetAccounts();
+
+  const onCreateAccount = (name: string) => accountMutation.mutate({ name });
+  const accountOptions = (accountQuery.data ?? []).map((account) => ({
+    label: account.name,
+    value: account.id,
+  }));
+
+  const isLoading =
+    transactionQuery.isLoading ||
+    categoryQuery.isLoading ||
+    accountQuery.isLoading;
+
+  const isPending =
+    editMutation.isPending ||
+    deleteMutation.isPending ||
+    transactionQuery.isLoading ||
+    categoryMutation.isPending ||
+    accountMutation.isPending;
 
   const onSubmit = (values: FormValues) => {
     editMutation.mutate(values, {
@@ -56,6 +86,26 @@ const EditTransactionSheet = () => {
     }
   };
 
+  const defaultValues = transactionQuery.data
+    ? {
+        accountId: transactionQuery.data.accountId,
+        categoryId: transactionQuery.data.categoryId,
+        amount: transactionQuery.data.amount.toString(),
+        date: transactionQuery.data.date
+          ? new Date(transactionQuery.data.date)
+          : new Date(),
+        payee: transactionQuery.data.payee,
+        notes: transactionQuery.data.notes,
+      }
+    : {
+        accountId: "",
+        categoryId: "",
+        amount: "",
+        date: new Date(),
+        payee: "",
+        notes: "",
+      };
+
   return (
     <>
       <ConfirmDialog />
@@ -73,8 +123,13 @@ const EditTransactionSheet = () => {
             <TransactionForm
               id={id}
               onSubmit={onSubmit}
-              disabled={isPending}
               onDelete={onDelete}
+              disabled={isPending}
+              categoryOptions={categoryOptions}
+              onCreateCategory={onCreateCategory}
+              accountOptions={accountOptions}
+              onCreateAccount={onCreateAccount}
+              defaultValues={defaultValues}
             />
           )}
         </SheetContent>
