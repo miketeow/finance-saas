@@ -8,7 +8,7 @@ import { columns } from "./columns";
 import { DataTable } from "@/components/data-table";
 import { useGetAccounts } from "@/features/accounts/api/use-get-accounts";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useBulkDeleteAccount } from "@/features/accounts/api/use-bulk-delete";
+import { useBulkDeleteAccount } from "@/features/accounts/api/use-bulk-delete-accounts";
 
 const AccountsPage = () => {
   const newAccount = useNewAccount();
@@ -46,7 +46,7 @@ const AccountsPage = () => {
         </CardHeader>
         <CardContent>
           <DataTable
-            filterKey="email"
+            filterKey="name"
             columns={columns}
             data={accounts}
             onDelete={(row) => {
